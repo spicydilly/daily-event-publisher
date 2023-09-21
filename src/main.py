@@ -10,14 +10,26 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-events = get_this_month_events(credentials_file="credentials.json")
+def main(credentials_path: str):
+    try:
+        events = get_this_month_events(credentials_file=credentials_path)
 
-messages = [event.pretty() for event in events]
-events_message = "\n\n".join(messages)
+        if not events:
+            logger.warning("No events found for this month.")
+            return
+
+        messages = [event.pretty() for event in events]
+        events_message = "\n\n".join(messages)
+
+        send_telegram_message(events_message, logger=logger)
+
+    except FileNotFoundError:
+        logger.error(f"Credentials file '{credentials_path}' not found.")
+    except Exception as e:
+        logger.error(f"Error: {e}")
 
 
-try:
-    send_telegram_message(events_message, logger=logger)
-except Exception as e:
-    # Handle error as needed
-    print(f"Error: {e}")
+if __name__ == "__main__":
+    # argparse?
+    credentials_path = "credentials.json"
+    main(credentials_path)
