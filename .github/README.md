@@ -1,22 +1,26 @@
 # daily-event-publisher
 
-## Connect To Google Calendar Using A Service Account
+This project integrates Google Calendar with Telegram, notifying users of their upcoming events for the month.
+
+## Prerequisites
+
+### Connect To Google Calendar Using A Service Account
 
 Before continuing, make sure you have a Google Account.
 
-### Project Creation
+#### Project Creation
 
 * Go to the [Google Cloud Console](https://console.cloud.google.com/).
 * Click on the project drop-down and then click on NEW `PROJECT`.
 * Give your project a name and click `CREATE`.
 
-### Enable Google Calendar API
+#### Enable Google Calendar API
 
 * In the left sidebar, navigate to `APIs & Services` > `Library`.
 * Search for `Google Calendar API` and select it.
 * Click `ENABLE`.
 
-### Service Account Creation
+#### Service Account Creation
 
 * In the left sidebar, navigate to `IAM & Admin` > `Service accounts`.
 * Click on `CREATE SERVICE ACCOUNT`.
@@ -24,14 +28,14 @@ Before continuing, make sure you have a Google Account.
 * Grant the service account the required permissions. For basic calendar access, you can choose `Role` > `Google Calendar API` > `Calendar Viewer`. Click `CONTINUE`.
 * Click `DONE`.
 
-### Download Credentials
+#### Download Credentials
 
 * In the service accounts list, find the service account you just created.
 * Click on its name to view details.
 * In the `KEYS` tab, click on `ADD KEY` > `JSON`.
 * A `credentials.json` file will be downloaded. This file contains the credentials your application will use to authenticate its API requests.
 
-### Share Your Google Calendar
+#### Share Your Google Calendar
 
 If you're intending to access a specific Google Calendar, make sure to share it with your service account:
 
@@ -40,6 +44,33 @@ If you're intending to access a specific Google Calendar, make sure to share it 
 * Scroll to the `Share with specific people`` section.
 * Click on `+ Add people` and enter the email address of the service account (found in the service account details in Google Cloud Console).
 * Set the desired permissions (e.g., `See all event details`) and click `Send`.
+
+### Telegram Bot Token and Channel ID
+
+* [Telegram Bot Tutorial](https://core.telegram.org/bots/tutorial).
+
+## Configuration
+
+* Google Calendar:
+    * credentials.json
+
+* Telegram:
+    * Environment Tokens.
+
+## Customization
+
+* Event Formatting:
+    * Modify the monthly_events_template.txt found in the templates directory to adjust the appearance of event messages.
+* Extended Fields in Google Calendar:
+    * When creating events in Google Calendar, you can specify additional details in the description as follows:
+
+        ```txt
+        Tickets: [Ticket Info]
+        Location: [Location Info]
+        Website: [Website URL]
+        ```
+
+    The application will parse these details and include them in the Telegram message.
 
 ## Local Development
 
