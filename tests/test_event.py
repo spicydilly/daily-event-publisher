@@ -11,7 +11,7 @@ class TestEvent(unittest.TestCase):
         expected_output = (
             "Event: Sample Event\n"
             "Description: This is a sample event.\n"
-            "Starts: 10:00 - Ends: 12:00\n"
+            "Starts: 10:00 - Ends: 12:00"
         )
         self.assertEqual(event.pretty(), expected_output)
 
@@ -28,7 +28,7 @@ class TestEvent(unittest.TestCase):
         expected_output = (
             "Event: Sample Event\nDescription: This is a sample"
             " event.\nStarts: 10:00 - Ends: 12:00\nTickets: www.tickets.com |"
-            " Location: Main Hall | Website: www.event-website.com\n"
+            " Location: Main Hall | Website: www.event-website.com"
         )
         self.assertEqual(event.pretty(), expected_output)
 
@@ -45,7 +45,7 @@ class TestEvent(unittest.TestCase):
             "Event: Sample Event\n"
             "Description: This is a sample event.\n"
             "Starts: 10:00 - Ends: 12:00\n"
-            "Tickets: www.tickets.com | Location: Main Hall\n"
+            "Tickets: www.tickets.com | Location: Main Hall"
         )
         self.assertEqual(event.pretty(), expected_output)
 

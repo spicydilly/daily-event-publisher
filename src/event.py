@@ -2,6 +2,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+TICKETS_PREFIX = "Tickets:"
+LOCATION_PREFIX = "Location:"
+WEBSITE_PREFIX = "Website:"
+
 
 @dataclass
 class Event:
@@ -34,6 +38,7 @@ class Event:
             raise ValueError("Start time is required.")
         if not self.end_time:
             raise ValueError("End time is required.")
+        self._parse_description(self.description)
 
     def _read_template(self) -> str:
         """Read the event template file."""
@@ -43,24 +48,42 @@ class Event:
         except Exception as e:
             raise IOError(f"Error reading template file: {e}")
 
+    def _parse_description(self, description: str) -> None:
+        """Parse the description to extract extended fields."""
+        lines = description.split("\n")
+
+        for line in lines:
+            if line.startswith(TICKETS_PREFIX):
+                self.tickets = line.replace(TICKETS_PREFIX, "").strip()
+            elif line.startswith(LOCATION_PREFIX):
+                self.location = line.replace(LOCATION_PREFIX, "").strip()
+            elif line.startswith(WEBSITE_PREFIX):
+                self.website = line.replace(WEBSITE_PREFIX, "").strip()
+
+        # Remove extracted details from the main description.
+        self.description = "\n".join(
+            [
+                line
+                for line in lines
+                if not line.startswith(
+                    (TICKETS_PREFIX, LOCATION_PREFIX, WEBSITE_PREFIX)
+                )
+            ]
+        ).strip()
+
     def pretty(self) -> str:
         """Pretty print the event using a template."""
         optional_fields = [
-            f"Tickets: {self.tickets}" if self.tickets else None,
-            f"Location: {self.location}" if self.location else None,
-            f"Website: {self.website}" if self.website else None,
+            f"{TICKETS_PREFIX} {self.tickets}" if self.tickets else None,
+            f"{LOCATION_PREFIX} {self.location}" if self.location else None,
+            f"{WEBSITE_PREFIX} {self.website}" if self.website else None,
         ]
         optional_str = " | ".join(filter(None, optional_fields))
 
-        event_pretty = self.template_content.format(
+        return self.template_content.format(
             title=self.title,
             description=self.description,
             start_time=self.start_time,
             end_time=self.end_time,
             optional_fields=optional_str,
-        )
-
-        if optional_str:
-            return event_pretty
-        # if no optional there is an extra blank line
-        return event_pretty[:-1]
+        ).rstrip()
