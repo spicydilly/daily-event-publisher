@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 events = get_this_month_events(credentials_file="credentials.json")
 
 messages = [event.pretty() for event in events]
-events_message = "\n\n".join(messages)
+events_message = "\n".join(messages)
 
 
 try:
