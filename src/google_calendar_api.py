@@ -10,29 +10,42 @@ from googleapiclient.discovery import Resource, build
 
 from event import Event
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
-
 
 class GoogleCalendarClient:
     """A class to handle operations related to the Google Calendar."""
 
-    CALENDAR_ID: str = os.environ.get("GOOGLE_CALENDAR_ID", "0")
+    SERVICE_NAME = "calendar"
+    SERVICE_VERSION = "v3"
+    SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 
-    def __init__(self, credentials_file: str = None):
+    def __init__(
+        self,
+        credentials_file: str = None,
+        calendar_id: str = None,
+        logger=None,
+    ):
         """Initializes the GoogleCalendarClient class with credentials."""
+
         if not credentials_file:
             credentials_file = os.environ.get(
                 "GOOGLE_CALENDAR_CREDENTIALS", "credentials.json"
             )
 
+        if not calendar_id:
+            calendar_id = os.environ.get("GOOGLE_CALENDAR_ID", "0")
+
+        self.calendar_id = calendar_id
+
         self.credentials: Credentials = Credentials.from_service_account_file(
-            credentials_file,
-            scopes=["https://www.googleapis.com/auth/calendar.readonly"],
+            credentials_file, scopes=self.SCOPES
         )
         self.service: Resource = build(
-            "calendar", "v3", credentials=self.credentials
+            self.SERVICE_NAME,
+            self.SERVICE_VERSION,
+            credentials=self.credentials,
         )
+
+        self.logger = logger or logging.getLogger(__name__)
 
     def get_events_this_month(self) -> List[Event]:
         """Returns the events for the current month in 'Event' format."""
@@ -48,7 +61,7 @@ class GoogleCalendarClient:
             events_result = (
                 self.service.events()
                 .list(
-                    calendarId=self.CALENDAR_ID,
+                    calendarId=self.calendar_id,
                     timeMin=first_day_of_month.isoformat() + "Z",
                     timeMax=last_day_of_month.isoformat() + "Z",
                     singleEvents=True,
@@ -56,8 +69,7 @@ class GoogleCalendarClient:
                 )
                 .execute()
             )
-
-            logging.info(
+            self.logger.info(
                 f"All Events: \n{json.dumps(events_result, indent=2)}"
             )
 
@@ -80,22 +92,20 @@ class GoogleCalendarClient:
             ]
 
             return events_list
-
         except Exception as e:
-            logging.error(f"Error fetching events: {e}")
+            self.logger.error(f"Error fetching events: {e}")
             return []
 
-    def get_events(self) -> List[Event]:
-        """Displays the events for the current month."""
-        events = self.get_events_this_month()
-        if not events:
-            logging.info("No events found for this month.")
-        else:
-            for event in events:
-                logging.info(event)
-        return events
 
-
-if __name__ == "__main__":
-    gc = GoogleCalendarClient("credentials.json")
-    gc.get_events()
+def get_this_month_events(
+    credentials_file: str = None, calendar_id: str = None, logger=None
+) -> List[Event]:
+    """
+    Convenience function to fetch events for the current month.
+    """
+    client = GoogleCalendarClient(
+        credentials_file=credentials_file,
+        calendar_id=calendar_id,
+        logger=logger,
+    )
+    return client.get_events_this_month()

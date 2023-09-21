@@ -1,0 +1,4 @@
+Event: {title}
+Description: {description}
+Starts: {start_time} - Ends: {end_time}
+{optional_fields}
