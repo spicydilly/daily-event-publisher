@@ -13,6 +13,7 @@ class Event:
 
     title: str = field(default=None)
     description: str = field(default=None)
+    date: str = field(default=None)
     start_time: str = field(default=None)
     end_time: str = field(default=None)
     tickets: Optional[str] = None
@@ -34,6 +35,8 @@ class Event:
             raise ValueError("Title is required.")
         if not self.description:
             raise ValueError("Description is required.")
+        if not self.date:
+            raise ValueError("Date is required.")
         if not self.start_time:
             raise ValueError("Start time is required.")
         if not self.end_time:
@@ -73,16 +76,27 @@ class Event:
 
     def pretty(self) -> str:
         """Pretty print the event using a template."""
-        optional_fields = [
-            f"{TICKETS_PREFIX} {self.tickets}" if self.tickets else None,
-            f"{LOCATION_PREFIX} {self.location}" if self.location else None,
-            f"{WEBSITE_PREFIX} {self.website}" if self.website else None,
+        # List of optional fields with conditions
+        optional_fields_data = [
+            (TICKETS_PREFIX, self.tickets),
+            (LOCATION_PREFIX, self.location),
+            (WEBSITE_PREFIX, self.website),
         ]
-        optional_str = " | ".join(filter(None, optional_fields))
+
+        # Generate the list of optional fields
+        optional_fields = [
+            f"[{prefix[:-1]}]({value})"
+            for prefix, value in optional_fields_data
+            if value
+        ]
+
+        # Combine the fields, and add square brackets if there's any content
+        optional_str = " | ".join(optional_fields) if optional_fields else ""
 
         return self.template_content.format(
             title=self.title,
             description=self.description,
+            date=self.date,
             start_time=self.start_time,
             end_time=self.end_time,
             optional_fields=optional_str,

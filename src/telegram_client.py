@@ -49,7 +49,12 @@ class TelegramBot:
         """
         endpoint = "sendMessage"
         url = BASE_URL.format(token=self.config.bot_token, endpoint=endpoint)
-        payload = {"chat_id": self.config.chat_id, "text": message}
+        payload = {
+            "chat_id": self.config.chat_id,
+            "text": message,
+            "parse_mode": "Markdown",
+            "disable_web_page_preview": "true",
+        }
 
         response = requests.post(url, data=payload)
         response_data = response.json()
