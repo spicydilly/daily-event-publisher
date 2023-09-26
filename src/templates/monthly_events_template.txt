@@ -1,4 +1,3 @@
-Event: {title}
-Description: {description}
-Starts: {start_time} - Ends: {end_time}
+*{title}* - {date} @ {start_time} to {end_time}
+{description}
 {optional_fields}

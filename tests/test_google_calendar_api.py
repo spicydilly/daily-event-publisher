@@ -47,14 +47,16 @@ class TestGoogleCalendarClient(unittest.TestCase):
             Event(
                 title="Test Event 1",
                 description="Description 1",
-                start_time="2023-09-19 10:00:00",
-                end_time="2023-09-19 11:00:00",
+                date="Sep 19th",
+                start_time="10AM",
+                end_time="11AM",
             ),
             Event(
                 title="Test Event 2",
                 description="Description 2",
-                start_time="2023-09-20 00:00:00",
-                end_time="2023-09-20 01:00:00",
+                date="Sep 20th",
+                start_time="12AM",
+                end_time="1AM",
             ),
         ]
         self.assertEqual(events, expected_events)

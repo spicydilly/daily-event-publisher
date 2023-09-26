@@ -57,6 +57,11 @@ class GoogleCalendarClient:
             first_day_of_month + relativedelta(months=1, days=-1)
         ).replace(hour=23, minute=59, second=59, microsecond=999999)
 
+        def extract_datetime(data):
+            return datetime.datetime.fromisoformat(
+                data.get("dateTime", data.get("date")).split("Z")[0]
+            )
+
         try:
             events_result = (
                 self.service.events()
@@ -77,16 +82,16 @@ class GoogleCalendarClient:
                 Event(
                     title=event.get("summary", ""),
                     description=event.get("description", ""),
-                    start_time=datetime.datetime.fromisoformat(
-                        event["start"]
-                        .get("dateTime", event["start"].get("date"))
-                        .split("Z")[0]
-                    ).strftime("%Y-%m-%d %H:%M:%S"),
-                    end_time=datetime.datetime.fromisoformat(
-                        event["end"]
-                        .get("dateTime", event["end"].get("date"))
-                        .split("Z")[0]
-                    ).strftime("%Y-%m-%d %H:%M:%S"),
+                    start_time=extract_datetime(event["start"])
+                    .strftime("%I%p")
+                    .lstrip("0"),
+                    date=(
+                        f"{extract_datetime(event['start']).strftime('%b')} "
+                        f"{self.ordinal(extract_datetime(event['start']).day)}"
+                    ),
+                    end_time=extract_datetime(event["end"])
+                    .strftime("%I%p")
+                    .lstrip("0"),
                 )
                 for event in events_result.get("items", [])
             ]
@@ -95,6 +100,15 @@ class GoogleCalendarClient:
         except Exception as e:
             self.logger.error(f"Error fetching events: {e}")
             return []
+
+    @staticmethod
+    def ordinal(n) -> str:
+        """Return number n with an ordinal string suffix."""
+        if 10 <= n % 100 <= 20:
+            suffix = "th"
+        else:
+            suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+        return f"{n}{suffix}"
 
 
 def get_this_month_events(
