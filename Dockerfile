@@ -6,7 +6,6 @@ WORKDIR /app
 # Copy the Python code into the Docker image
 COPY src/ src/
 COPY pyproject.toml .
-COPY credentials.json .
 
 RUN pip install --no-cache-dir poetry
 
