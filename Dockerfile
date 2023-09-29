@@ -8,7 +8,7 @@ COPY src/ src/
 COPY pyproject.toml .
 COPY credentials.json .
 
-RUN pip install poetry
+RUN pip install --no-cache-dir poetry
 
 # Install dependencies using Poetry
 RUN poetry config virtualenvs.create false \
