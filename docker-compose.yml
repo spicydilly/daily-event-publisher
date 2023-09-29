@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  event-publisher:
+    build: .
+    environment:
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - TELEGRAM_API=${TELEGRAM_API}
+      - GOOGLE_CALENDAR_ID=${GOOGLE_CALENDAR_ID}
+      - GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}

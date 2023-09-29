@@ -5,9 +5,8 @@ from src.google_calendar_api import Event, GoogleCalendarClient
 
 
 class TestGoogleCalendarClient(unittest.TestCase):
-    @patch("src.google_calendar_api.Credentials.from_service_account_file")
-    @patch("src.google_calendar_api.build")
-    def setUp(self, mock_build, mock_from_service_account_file):
+    @patch("src.google_calendar_api.Credentials.from_service_account_info")
+    def setUp(self, mock_from_service_account_info):
         self.gc = GoogleCalendarClient()
         self.mock_service = MagicMock()
         self.gc.service = self.mock_service
@@ -60,3 +59,14 @@ class TestGoogleCalendarClient(unittest.TestCase):
             ),
         ]
         self.assertEqual(events, expected_events)
+
+    @patch.dict(
+        "os.environ", {"GOOGLE_CALENDAR_ID": "", "GOOGLE_CREDENTIALS": ""}
+    )
+    def test_initialization_without_calendarid_and_credentials(self):
+        with self.assertRaises(ValueError) as context:
+            self.gcNoEnv = GoogleCalendarClient()
+        self.assertTrue(
+            "Credentials must be provided or set as an environment variable."
+            in str(context.exception)
+        )

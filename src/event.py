@@ -74,13 +74,17 @@ class Event:
             ]
         ).strip()
 
-    def pretty(self) -> str:
+
+@dataclass()
+class EventFormatter:
+    @staticmethod
+    def format(event: Event) -> str:
         """Pretty print the event using a template."""
         # List of optional fields with conditions
         optional_fields_data = [
-            (TICKETS_PREFIX, self.tickets),
-            (LOCATION_PREFIX, self.location),
-            (WEBSITE_PREFIX, self.website),
+            (TICKETS_PREFIX, event.tickets),
+            (LOCATION_PREFIX, event.location),
+            (WEBSITE_PREFIX, event.website),
         ]
 
         # Generate the list of optional fields
@@ -93,11 +97,11 @@ class Event:
         # Combine the fields, and add square brackets if there's any content
         optional_str = " | ".join(optional_fields) if optional_fields else ""
 
-        return self.template_content.format(
-            title=self.title,
-            description=self.description,
-            date=self.date,
-            start_time=self.start_time,
-            end_time=self.end_time,
+        return event.template_content.format(
+            title=event.title,
+            description=event.description,
+            date=event.date,
+            start_time=event.start_time,
+            end_time=event.end_time,
             optional_fields=optional_str,
         ).rstrip()

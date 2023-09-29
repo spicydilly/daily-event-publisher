@@ -1,5 +1,6 @@
 import logging
 
+from event import EventFormatter
 from google_calendar_api import get_this_month_events
 from telegram_client import send_telegram_message
 
@@ -10,26 +11,30 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def main(credentials_path: str):
+def main():
     try:
-        events = get_this_month_events(credentials_file=credentials_path)
+        events = get_this_month_events()
 
         if not events:
             logger.warning("No events found for this month.")
             return
 
-        messages = [event.pretty() for event in events]
+        messages = []
+        for event in events:
+            try:
+                formatted_event = EventFormatter.format(event)
+                messages.append(formatted_event)
+            except Exception as format_error:
+                logger.error(f"Error formatting event {event}: {format_error}")
+                continue  # continue processing other events
+
         events_message = "\n\n".join(messages)
 
         send_telegram_message(events_message, logger=logger)
 
-    except FileNotFoundError:
-        logger.error(f"Credentials file '{credentials_path}' not found.")
     except Exception as e:
         logger.error(f"Error: {e}")
 
 
 if __name__ == "__main__":
-    # argparse?
-    credentials_path = "credentials.json"
-    main(credentials_path)
+    main()
