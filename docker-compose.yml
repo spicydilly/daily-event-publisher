@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  python-script:
+    build: .
+    privileged: true
+    environment:
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - TELEGRAM_API=${TELEGRAM_API}
+      - GOOGLE_CALENDAR_ID=${GOOGLE_CALENDAR_ID}
