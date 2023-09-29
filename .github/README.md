@@ -1,4 +1,4 @@
-# daily-event-publisher
+# telegram-event-publisher
 
 This project integrates Google Calendar with Telegram, notifying users of their upcoming events for the month.
 
