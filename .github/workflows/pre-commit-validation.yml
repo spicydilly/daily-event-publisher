@@ -33,7 +33,7 @@ jobs:
 
       - name: Run Unit Tests
         run: |
-          poetry run pytest
+          poetry run pytest -v
 
       - name: Run pre-commit
         run: poetry run pre-commit run --all-files

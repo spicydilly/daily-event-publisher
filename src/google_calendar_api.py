@@ -27,10 +27,20 @@ class GoogleCalendarClient:
         """Initializes the GoogleCalendarClient class with credentials."""
 
         if not credentials:
-            credentials = os.environ.get("GOOGLE_CREDENTIALS", "")
+            credentials = os.environ.get("GOOGLE_CREDENTIALS")
+            if not credentials:
+                raise ValueError(
+                    "Credentials must be provided or set as an environment"
+                    " variable."
+                )
 
         if not calendar_id:
-            calendar_id = os.environ.get("GOOGLE_CALENDAR_ID", "0")
+            calendar_id = os.environ.get("GOOGLE_CALENDAR_ID")
+            if not calendar_id:
+                raise ValueError(
+                    "Calendar ID must be provided or set as an environment"
+                    " variable."
+                )
 
         self.calendar_id = calendar_id
 
