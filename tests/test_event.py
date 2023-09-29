@@ -1,6 +1,6 @@
 import unittest
 
-from src.event import Event
+from src.event import Event, EventFormatter
 
 
 class TestEvent(unittest.TestCase):
@@ -66,7 +66,7 @@ class TestEvent(unittest.TestCase):
             "*Sample Event* - 2023-09-26 @ 10:00 to 12:00\n"
             "This is a sample event."
         )
-        self.assertEqual(event.pretty(), expected_output)
+        self.assertEqual(EventFormatter.format(event), expected_output)
 
     def test_pretty_with_all_fields(self):
         event = Event(
@@ -84,7 +84,7 @@ class TestEvent(unittest.TestCase):
             " event.\n[Tickets](www.tickets.com) | [Location](Main Hall) |"
             " [Website](www.event-website.com)"
         )
-        self.assertEqual(event.pretty(), expected_output)
+        self.assertEqual(EventFormatter.format(event), expected_output)
 
     def test_pretty_with_some_optional_fields(self):
         event = Event(
@@ -102,7 +102,7 @@ class TestEvent(unittest.TestCase):
             "This is a sample event.\n"
             "[Tickets](www.tickets.com) | [Location](Main Hall)"
         )
-        self.assertEqual(event.pretty(), expected_output)
+        self.assertEqual(EventFormatter.format(event), expected_output)
 
 
 if __name__ == "__main__":

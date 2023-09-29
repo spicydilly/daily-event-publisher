@@ -20,25 +20,24 @@ class GoogleCalendarClient:
 
     def __init__(
         self,
-        credentials_file: str = None,
+        credentials: str = None,
         calendar_id: str = None,
         logger=None,
     ):
         """Initializes the GoogleCalendarClient class with credentials."""
 
-        if not credentials_file:
-            credentials_file = os.environ.get(
-                "GOOGLE_CALENDAR_CREDENTIALS", "credentials.json"
-            )
+        if not credentials:
+            credentials = os.environ.get("GOOGLE_CREDENTIALS", "")
 
         if not calendar_id:
             calendar_id = os.environ.get("GOOGLE_CALENDAR_ID", "0")
 
         self.calendar_id = calendar_id
 
-        self.credentials: Credentials = Credentials.from_service_account_file(
-            credentials_file, scopes=self.SCOPES
+        self.credentials: Credentials = Credentials.from_service_account_info(
+            json.loads(credentials)
         )
+
         self.service: Resource = build(
             self.SERVICE_NAME,
             self.SERVICE_VERSION,
@@ -112,13 +111,13 @@ class GoogleCalendarClient:
 
 
 def get_this_month_events(
-    credentials_file: str = None, calendar_id: str = None, logger=None
+    credentials: str = None, calendar_id: str = None, logger=None
 ) -> List[Event]:
     """
     Convenience function to fetch events for the current month.
     """
     client = GoogleCalendarClient(
-        credentials_file=credentials_file,
+        credentials=credentials,
         calendar_id=calendar_id,
         logger=logger,
     )

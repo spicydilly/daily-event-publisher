@@ -118,6 +118,14 @@ If you're intending to access a specific Google Calendar, make sure to share it 
         * Find the Calendar ID:
             * In the settings page, scroll down to the “Integrate calendar” section.
             * Here, you'll find a field labeled `Calendar ID`. This is the ID you're looking for. It often looks like an email address and might end with @group.calendar.google.com.
+    * `TELEGRAM_CHAT_ID`
+    * `TELEGRAM_API`
+    * `GOOGLE_CREDENTIALS`
+        * Using the `crendentials.json` file downloaded as described in [Download Credentials](#download-credentials), store it's contents as an environment variable as shown below.
+
+            ```sh
+            export GOOGLE_CREDENTIALS=$(cat credentials.json)
+            ```
 
 ## Refrences
 

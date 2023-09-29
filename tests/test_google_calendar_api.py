@@ -1,13 +1,11 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from src.google_calendar_api import Event, GoogleCalendarClient
 
 
 class TestGoogleCalendarClient(unittest.TestCase):
-    @patch("src.google_calendar_api.Credentials.from_service_account_file")
-    @patch("src.google_calendar_api.build")
-    def setUp(self, mock_build, mock_from_service_account_file):
+    def setUp(self):
         self.gc = GoogleCalendarClient()
         self.mock_service = MagicMock()
         self.gc.service = self.mock_service
