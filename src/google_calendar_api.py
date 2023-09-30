@@ -66,11 +66,6 @@ class GoogleCalendarClient:
             first_day_of_month + relativedelta(months=1, days=-1)
         ).replace(hour=23, minute=59, second=59, microsecond=999999)
 
-        def extract_datetime(data):
-            return datetime.datetime.fromisoformat(
-                data.get("dateTime", data.get("date")).split("Z")[0]
-            )
-
         try:
             events_result = (
                 self.service.events()
@@ -90,15 +85,16 @@ class GoogleCalendarClient:
             events_list: List[Event] = [
                 Event(
                     title=event.get("summary", ""),
+                    location=event.get("location", ""),
                     description=event.get("description", ""),
-                    start_time=extract_datetime(event["start"])
+                    start_time=self.get_date(event["start"])
                     .strftime("%I%p")
                     .lstrip("0"),
                     date=(
-                        f"{extract_datetime(event['start']).strftime('%b')} "
-                        f"{self.ordinal(extract_datetime(event['start']).day)}"
+                        f"{self.get_date(event['start']).strftime('%b')} "
+                        f"{self.ordinal(self.get_date(event['start']).day)}"
                     ),
-                    end_time=extract_datetime(event["end"])
+                    end_time=self.get_date(event["end"])
                     .strftime("%I%p")
                     .lstrip("0"),
                 )
@@ -109,6 +105,12 @@ class GoogleCalendarClient:
         except Exception as e:
             self.logger.error(f"Error fetching events: {e}")
             return []
+
+    @staticmethod
+    def get_date(data):
+        return datetime.datetime.fromisoformat(
+            data.get("dateTime", data.get("date")).split("Z")[0]
+        )
 
     @staticmethod
     def ordinal(n) -> str:

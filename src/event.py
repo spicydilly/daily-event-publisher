@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Optional
 
 TICKETS_PREFIX = "Tickets:"
-LOCATION_PREFIX = "Location:"
 WEBSITE_PREFIX = "Website:"
 
 
@@ -12,12 +11,12 @@ class Event:
     """Dataclass to represent an event"""
 
     title: str = field(default=None)
+    location: str = field(default=None)
     description: str = field(default=None)
     date: str = field(default=None)
     start_time: str = field(default=None)
     end_time: str = field(default=None)
     tickets: Optional[str] = None
-    location: Optional[str] = None
     website: Optional[str] = None
 
     TEMPLATE_PATH = (
@@ -33,6 +32,8 @@ class Event:
     def __post_init__(self):
         if not self.title:
             raise ValueError("Title is required.")
+        if not self.location:
+            raise ValueError("Location is required.")
         if not self.description:
             raise ValueError("Description is required.")
         if not self.date:
@@ -58,8 +59,6 @@ class Event:
         for line in lines:
             if line.startswith(TICKETS_PREFIX):
                 self.tickets = line.replace(TICKETS_PREFIX, "").strip()
-            elif line.startswith(LOCATION_PREFIX):
-                self.location = line.replace(LOCATION_PREFIX, "").strip()
             elif line.startswith(WEBSITE_PREFIX):
                 self.website = line.replace(WEBSITE_PREFIX, "").strip()
 
@@ -68,9 +67,7 @@ class Event:
             [
                 line
                 for line in lines
-                if not line.startswith(
-                    (TICKETS_PREFIX, LOCATION_PREFIX, WEBSITE_PREFIX)
-                )
+                if not line.startswith((TICKETS_PREFIX, WEBSITE_PREFIX))
             ]
         ).strip()
 
@@ -83,7 +80,6 @@ class EventFormatter:
         # List of optional fields with conditions
         optional_fields_data = [
             (TICKETS_PREFIX, event.tickets),
-            (LOCATION_PREFIX, event.location),
             (WEBSITE_PREFIX, event.website),
         ]
 
@@ -99,6 +95,7 @@ class EventFormatter:
 
         return event.template_content.format(
             title=event.title,
+            location=event.location,
             description=event.description,
             date=event.date,
             start_time=event.start_time,

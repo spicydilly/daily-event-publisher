@@ -27,12 +27,14 @@ class TestGoogleCalendarClient(unittest.TestCase):
         mock_response_items = [
             {
                 "summary": "Test Event 1",
+                "location": "A Place",
                 "description": "Description 1",
                 "start": {"dateTime": "2023-09-19T10:00:00+01:00"},
                 "end": {"dateTime": "2023-09-19T11:00:00+01:00"},
             },
             {
                 "summary": "Test Event 2",
+                "location": "A Place",
                 "description": "Description 2",
                 "start": {"dateTime": "2023-09-20T00:00:00+01:00"},
                 "end": {"dateTime": "2023-09-20T01:00:00+01:00"},
@@ -45,6 +47,7 @@ class TestGoogleCalendarClient(unittest.TestCase):
         expected_events = [
             Event(
                 title="Test Event 1",
+                location="A Place",
                 description="Description 1",
                 date="Sep 19th",
                 start_time="10AM",
@@ -52,6 +55,7 @@ class TestGoogleCalendarClient(unittest.TestCase):
             ),
             Event(
                 title="Test Event 2",
+                location="A Place",
                 description="Description 2",
                 date="Sep 20th",
                 start_time="12AM",
