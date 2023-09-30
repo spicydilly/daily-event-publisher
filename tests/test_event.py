@@ -8,6 +8,7 @@ class TestEvent(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             Event(
                 description="This is a sample event.",
+                location="A Place",
                 date="2023-09-26",
                 start_time="10:00",
                 end_time="12:00",
@@ -18,6 +19,7 @@ class TestEvent(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             Event(
                 title="Sample Event",
+                location="A Place",
                 date="2023-09-26",
                 start_time="10:00",
                 end_time="12:00",
@@ -28,6 +30,7 @@ class TestEvent(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             Event(
                 title="Sample Event",
+                location="A Place",
                 description="This is a sample event.",
                 start_time="10:00",
                 end_time="12:00",
@@ -38,6 +41,7 @@ class TestEvent(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             Event(
                 title="Sample Event",
+                location="A Place",
                 date="2023-09-26",
                 description="This is a sample event.",
                 end_time="12:00",
@@ -48,6 +52,7 @@ class TestEvent(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             Event(
                 title="Sample Event",
+                location="A Place",
                 date="2023-09-26",
                 description="This is a sample event.",
                 start_time="10:00",
@@ -57,13 +62,14 @@ class TestEvent(unittest.TestCase):
     def test_pretty_with_mandatory_fields(self):
         event = Event(
             title="Sample Event",
+            location="A Place",
             description="This is a sample event.",
             date="2023-09-26",
             start_time="10:00",
             end_time="12:00",
         )
         expected_output = (
-            "*Sample Event* - 2023-09-26 @ 10:00 to 12:00\n"
+            "*Sample Event* - 2023-09-26 10:00 to 12:00 @ A Place\n"
             "This is a sample event."
         )
         self.assertEqual(EventFormatter.format(event), expected_output)
@@ -71,17 +77,18 @@ class TestEvent(unittest.TestCase):
     def test_pretty_with_all_fields(self):
         event = Event(
             title="Sample Event",
+            location="A Place",
             description=(
-                "This is a sample event.\nTickets: www.tickets.com\nLocation:"
-                " Main Hall\nWebsite: www.event-website.com"
+                "This is a sample event.\nTickets: www.tickets.com\nWebsite:"
+                " www.event-website.com"
             ),
             date="2023-09-26",
             start_time="10:00",
             end_time="12:00",
         )
         expected_output = (
-            "*Sample Event* - 2023-09-26 @ 10:00 to 12:00\nThis is a sample"
-            " event.\n[Tickets](www.tickets.com) | [Location](Main Hall) |"
+            "*Sample Event* - 2023-09-26 10:00 to 12:00 @ A Place\nThis is a"
+            " sample event.\n[Tickets](www.tickets.com) |"
             " [Website](www.event-website.com)"
         )
         self.assertEqual(EventFormatter.format(event), expected_output)
@@ -89,18 +96,16 @@ class TestEvent(unittest.TestCase):
     def test_pretty_with_some_optional_fields(self):
         event = Event(
             title="Sample Event",
-            description=(
-                "This is a sample event.\nTickets: www.tickets.com\nLocation:"
-                " Main Hall"
-            ),
+            location="A Place",
+            description="This is a sample event.\nTickets: www.tickets.com",
             date="2023-09-26",
             start_time="10:00",
             end_time="12:00",
         )
         expected_output = (
-            "*Sample Event* - 2023-09-26 @ 10:00 to 12:00\n"
+            "*Sample Event* - 2023-09-26 10:00 to 12:00 @ A Place\n"
             "This is a sample event.\n"
-            "[Tickets](www.tickets.com) | [Location](Main Hall)"
+            "[Tickets](www.tickets.com)"
         )
         self.assertEqual(EventFormatter.format(event), expected_output)
 

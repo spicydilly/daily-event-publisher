@@ -56,6 +56,12 @@ class GoogleCalendarClient:
 
         self.logger = logger or logging.getLogger(__name__)
 
+    @staticmethod
+    def extract_datetime(data):
+        return datetime.datetime.fromisoformat(
+            data.get("dateTime", data.get("date")).split("Z")[0]
+        )
+
     def get_events_this_month(self) -> List[Event]:
         """Returns the events for the current month in 'Event' format."""
         today = datetime.datetime.utcnow()
@@ -65,11 +71,6 @@ class GoogleCalendarClient:
         last_day_of_month = (
             first_day_of_month + relativedelta(months=1, days=-1)
         ).replace(hour=23, minute=59, second=59, microsecond=999999)
-
-        def extract_datetime(data):
-            return datetime.datetime.fromisoformat(
-                data.get("dateTime", data.get("date")).split("Z")[0]
-            )
 
         try:
             events_result = (
@@ -90,15 +91,16 @@ class GoogleCalendarClient:
             events_list: List[Event] = [
                 Event(
                     title=event.get("summary", ""),
+                    location=event.get("location", ""),
                     description=event.get("description", ""),
-                    start_time=extract_datetime(event["start"])
+                    start_time=self.extract_datetime(event["start"])
                     .strftime("%I%p")
                     .lstrip("0"),
                     date=(
-                        f"{extract_datetime(event['start']).strftime('%b')} "
-                        f"{self.ordinal(extract_datetime(event['start']).day)}"
+                        f"{self.extract_datetime(event['start']).strftime('%b')} "
+                        f"{self.ordinal(self.extract_datetime(event['start']).day)}"
                     ),
-                    end_time=extract_datetime(event["end"])
+                    end_time=self.extract_datetime(event["end"])
                     .strftime("%I%p")
                     .lstrip("0"),
                 )
