@@ -56,12 +56,6 @@ class GoogleCalendarClient:
 
         self.logger = logger or logging.getLogger(__name__)
 
-    @staticmethod
-    def extract_datetime(data):
-        return datetime.datetime.fromisoformat(
-            data.get("dateTime", data.get("date")).split("Z")[0]
-        )
-
     def get_events_this_month(self) -> List[Event]:
         """Returns the events for the current month in 'Event' format."""
         today = datetime.datetime.utcnow()
@@ -93,14 +87,14 @@ class GoogleCalendarClient:
                     title=event.get("summary", ""),
                     location=event.get("location", ""),
                     description=event.get("description", ""),
-                    start_time=self.extract_datetime(event["start"])
+                    start_time=self.get_date(event["start"])
                     .strftime("%I%p")
                     .lstrip("0"),
                     date=(
-                        f"{self.extract_datetime(event['start']).strftime('%b')} "
-                        f"{self.ordinal(self.extract_datetime(event['start']).day)}"
+                        f"{self.get_date(event['start']).strftime('%b')} "
+                        f"{self.ordinal(self.get_date(event['start']).day)}"
                     ),
-                    end_time=self.extract_datetime(event["end"])
+                    end_time=self.get_date(event["end"])
                     .strftime("%I%p")
                     .lstrip("0"),
                 )
@@ -111,6 +105,12 @@ class GoogleCalendarClient:
         except Exception as e:
             self.logger.error(f"Error fetching events: {e}")
             return []
+
+    @staticmethod
+    def get_date(data):
+        return datetime.datetime.fromisoformat(
+            data.get("dateTime", data.get("date")).split("Z")[0]
+        )
 
     @staticmethod
     def ordinal(n) -> str:
