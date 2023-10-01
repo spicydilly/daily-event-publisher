@@ -1,7 +1,7 @@
-import datetime
 import json
 import logging
 import os
+from datetime import datetime, timedelta
 from typing import List
 
 from dateutil.relativedelta import relativedelta
@@ -56,23 +56,51 @@ class GoogleCalendarClient:
 
         self.logger = logger or logging.getLogger(__name__)
 
-    def get_events_this_month(self) -> List[Event]:
-        """Returns the events for the current month in 'Event' format."""
-        today = datetime.datetime.utcnow()
-        first_day_of_month = today.replace(
-            day=1, hour=0, minute=0, second=0, microsecond=0
-        )
-        last_day_of_month = (
-            first_day_of_month + relativedelta(months=1, days=-1)
-        ).replace(hour=23, minute=59, second=59, microsecond=999999)
+    @staticmethod
+    def determine_date_range(range_type: str = "month") -> tuple():
+        """
+        Determines the date range to fetch events for.
+        :param range_type: 'month' or 'week' to specify the desired date range.
+        """
+        if range_type not in ["month", "week"]:
+            raise ValueError("range_type must be either 'month' or 'week'")
 
+        today = datetime.utcnow()
+        if range_type == "month":
+            start_date = today.replace(
+                day=1, hour=0, minute=0, second=0, microsecond=0
+            )
+            end_date = (start_date + relativedelta(months=1, days=-1)).replace(
+                hour=23, minute=59, second=59, microsecond=999999
+            )
+        else:
+            days_until_tuesday = (
+                1 - today.weekday() + 7
+            ) % 7  # 1 represents Tuesday
+            start_date = (today + timedelta(days=days_until_tuesday)).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+            days_until_next_monday = (
+                0 - today.weekday() + 7
+            ) % 7 + 7  # 0 represents Monday
+            end_date = (
+                today + timedelta(days=days_until_next_monday)
+            ).replace(hour=23, minute=59, second=59, microsecond=999999)
+        return (start_date.isoformat() + "Z", end_date.isoformat() + "Z")
+
+    def get_events(self, range_type: str = "month") -> List[Event]:
+        """
+        Returns the events for the specified date range in 'Event' format.
+        :param range_type: 'month' or 'week' to specify the desired date range.
+        """
+        date_range = self.determine_date_range(range_type)
         try:
             events_result = (
                 self.service.events()
                 .list(
                     calendarId=self.calendar_id,
-                    timeMin=first_day_of_month.isoformat() + "Z",
-                    timeMax=last_day_of_month.isoformat() + "Z",
+                    timeMin=date_range[0],
+                    timeMax=date_range[1],
                     singleEvents=True,
                     orderBy="startTime",
                 )
@@ -108,7 +136,7 @@ class GoogleCalendarClient:
 
     @staticmethod
     def get_date(data):
-        return datetime.datetime.fromisoformat(
+        return datetime.fromisoformat(
             data.get("dateTime", data.get("date")).split("Z")[0]
         )
 
@@ -122,8 +150,11 @@ class GoogleCalendarClient:
         return f"{n}{suffix}"
 
 
-def get_this_month_events(
-    credentials: str = None, calendar_id: str = None, logger=None
+def get_events(
+    credentials: str = None,
+    calendar_id: str = None,
+    logger=None,
+    range_type: str = "month",
 ) -> List[Event]:
     """
     Convenience function to fetch events for the current month.
@@ -133,4 +164,4 @@ def get_this_month_events(
         calendar_id=calendar_id,
         logger=logger,
     )
-    return client.get_events_this_month()
+    return client.get_events(range_type=range_type)

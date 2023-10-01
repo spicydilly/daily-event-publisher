@@ -1,7 +1,8 @@
+import argparse
 import logging
 
 from event import EventFormatter
-from google_calendar_api import get_this_month_events
+from google_calendar_api import get_events
 from telegram_client import send_telegram_message
 
 logging.basicConfig(
@@ -11,12 +12,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main(range_type: str):
     try:
-        events = get_this_month_events()
+        events = get_events(range_type=range_type)
 
         if not events:
-            logger.warning("No events found for this month.")
+            logger.warning("No events found.")
             return
 
         messages = []
@@ -37,4 +38,19 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Fetch Google Calendar events and send them via Telegram."
+    )
+    parser.add_argument(
+        "--range-type",
+        type=str,
+        choices=["week", "month"],
+        default="month",
+        help=(
+            "Specify whether to fetch events for the week or the month."
+            " Defaults to month."
+        ),
+    )
+    args = parser.parse_args()
+
+    main(range_type=args.range_type)

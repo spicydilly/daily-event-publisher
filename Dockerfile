@@ -13,5 +13,8 @@ RUN pip install --no-cache-dir poetry
 RUN poetry config virtualenvs.create false \
     && poetry install --no-dev --no-root
 
-# Command to run the script
-CMD ["python", "src/main.py"]
+# Set the entrypoint to Python interpreter
+ENTRYPOINT ["python"]
+
+# Set the default command to run the script with default arguments
+CMD ["src/main.py", "--range-type", "month"]
