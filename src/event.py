@@ -1,48 +1,51 @@
-from dataclasses import dataclass, field
+import logging
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 TICKETS_PREFIX = "Tickets:"
 WEBSITE_PREFIX = "Website:"
+TEMPLATE_FILE_NAME = "monthly_events_template.txt"
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
 class Event:
-    """Dataclass to represent an event"""
+    """Dataclass to represent an event."""
 
-    title: str = field(default=None)
-    location: str = field(default=None)
-    description: str = field(default=None)
-    date: str = field(default=None)
-    start_time: str = field(default=None)
-    end_time: str = field(default=None)
+    title: str
+    location: str
+    description: str
+    date: str
+    start_time: str
+    end_time: str
     tickets: Optional[str] = None
     website: Optional[str] = None
 
-    TEMPLATE_PATH = (
-        Path(__file__).parent / "templates/monthly_events_template.txt"
-    )
+    TEMPLATE_PATH = Path(__file__).parent / f"templates/{TEMPLATE_FILE_NAME}"
+
+    def __post_init__(self) -> None:
+        required_fields = [
+            "title",
+            "location",
+            "description",
+            "date",
+            "start_time",
+            "end_time",
+        ]
+        for field_name in required_fields:
+            if not getattr(self, field_name):
+                raise ValueError(f"{field_name.capitalize()} is required.")
+
+        self._parse_description(self.description)
 
     @property
     def template_content(self) -> str:
+        """Lazy-load the template content."""
         if not hasattr(self, "_template_content"):
             self._template_content = self._read_template()
         return self._template_content
-
-    def __post_init__(self):
-        if not self.title:
-            raise ValueError("Title is required.")
-        if not self.location:
-            raise ValueError("Location is required.")
-        if not self.description:
-            raise ValueError("Description is required.")
-        if not self.date:
-            raise ValueError("Date is required.")
-        if not self.start_time:
-            raise ValueError("Start time is required.")
-        if not self.end_time:
-            raise ValueError("End time is required.")
-        self._parse_description(self.description)
 
     def _read_template(self) -> str:
         """Read the event template file."""
@@ -50,48 +53,31 @@ class Event:
             with self.TEMPLATE_PATH.open() as template_file:
                 return template_file.read()
         except Exception as e:
+            logger.error(f"Error reading template file: {e}")
             raise IOError(f"Error reading template file: {e}")
 
     def _parse_description(self, description: str) -> None:
         """Parse the description to extract extended fields."""
         lines = description.split("\n")
+        parsed_lines = []
 
         for line in lines:
             if line.startswith(TICKETS_PREFIX):
                 self.tickets = line.replace(TICKETS_PREFIX, "").strip()
             elif line.startswith(WEBSITE_PREFIX):
                 self.website = line.replace(WEBSITE_PREFIX, "").strip()
+            else:
+                parsed_lines.append(line)
 
-        # Remove extracted details from the main description.
-        self.description = "\n".join(
-            [
-                line
-                for line in lines
-                if not line.startswith((TICKETS_PREFIX, WEBSITE_PREFIX))
-            ]
-        ).strip()
+        self.description = "\n".join(parsed_lines).strip()
 
 
-@dataclass()
+@dataclass
 class EventFormatter:
     @staticmethod
     def format(event: Event) -> str:
         """Pretty print the event using a template."""
-        # List of optional fields with conditions
-        optional_fields_data = [
-            (TICKETS_PREFIX, event.tickets),
-            (WEBSITE_PREFIX, event.website),
-        ]
-
-        # Generate the list of optional fields
-        optional_fields = [
-            f"[{prefix[:-1]}]({value})"
-            for prefix, value in optional_fields_data
-            if value
-        ]
-
-        # Combine the fields, and add square brackets if there's any content
-        optional_str = " | ".join(optional_fields) if optional_fields else ""
+        optional_fields = EventFormatter._generate_optional_fields(event)
 
         return event.template_content.format(
             title=event.title,
@@ -100,5 +86,21 @@ class EventFormatter:
             date=event.date,
             start_time=event.start_time,
             end_time=event.end_time,
-            optional_fields=optional_str,
+            optional_fields=optional_fields,
         ).rstrip()
+
+    @staticmethod
+    def _generate_optional_fields(event: Event) -> str:
+        """Generate a string of optional fields in markdown format."""
+        optional_fields_data = [
+            (TICKETS_PREFIX, event.tickets),
+            (WEBSITE_PREFIX, event.website),
+        ]
+
+        optional_fields = [
+            f"[{prefix[:-1]}]({value})"
+            for prefix, value in optional_fields_data
+            if value
+        ]
+
+        return " | ".join(optional_fields) if optional_fields else ""

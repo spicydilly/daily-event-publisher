@@ -52,25 +52,25 @@ If you're intending to access a specific Google Calendar, make sure to share it 
 ## Configuration
 
 * Google Calendar:
-    * credentials.json
+  * credentials.json
 
 * Telegram:
-    * Environment Tokens.
+  * Environment Tokens.
 
 ## Customization
 
 * Event Formatting:
-    * Modify the monthly_events_template.txt found in the templates directory to adjust the appearance of event messages.
+  * Modify the monthly_events_template.txt found in the templates directory to adjust the appearance of event messages.
 * Extended Fields in Google Calendar:
-    * When creating events in Google Calendar, you can specify additional details in the description as follows:
+  * When creating events in Google Calendar, you can specify additional details in the description as follows:
 
-        ```txt
-        Tickets: [Ticket Info]
-        Location: [Location Info]
-        Website: [Website URL]
-        ```
+```txt
+Tickets: [Ticket Info]
+Location: [Location Info]
+Website: [Website URL]
+```
 
-    The application will parse these details and include them in the Telegram message.
+The application will parse these details and include them in the Telegram message.
 
 ## Local Development
 
@@ -86,9 +86,9 @@ If you're intending to access a specific Google Calendar, make sure to share it 
 
 * [Pre-commit](https://pre-commit.com/) is used to enforce code quality. If you don't have pre-commit installed, you can install it using the following command:
 
-    ```shell
-    pip install pre-commit
-    ```
+  ```shell
+  pip install pre-commit
+  ```
 
 ### Setting up the Development environment
 
@@ -101,8 +101,7 @@ If you're intending to access a specific Google Calendar, make sure to share it 
 2. Install dependencies and activate the virtual environment:
 
     ```shell
-    poetry install
-    poetry shell
+    poetry install --no-root
     ```
 
 3. The following Environment Variables must exist locally to run this project.

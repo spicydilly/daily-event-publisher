@@ -1,5 +1,6 @@
 import argparse
 import logging
+from typing import List
 
 from event import EventFormatter
 from google_calendar_api import get_events
@@ -12,29 +13,73 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def main(range_type: str):
+def fetch_and_format_events(range_type: str) -> List[str]:
+    """
+    Fetch events from Google Calendar and format them.
+
+    Args:
+        range_type: 'week' or 'month' to specify the desired date range.
+
+    Returns:
+        A list of formatted event strings.
+    """
     try:
         events = get_events(range_type=range_type)
-
         if not events:
             logger.warning("No events found.")
-            return
+            return []
 
-        messages = []
+        formatted_events = []
         for event in events:
             try:
                 formatted_event = EventFormatter.format(event)
-                messages.append(formatted_event)
+                formatted_events.append(formatted_event)
             except Exception as format_error:
                 logger.error(f"Error formatting event {event}: {format_error}")
-                continue  # continue processing other events
 
-        events_message = "\n\n".join(messages)
+        return formatted_events
 
-        send_telegram_message(events_message, logger=logger)
-
+    except ConnectionError:
+        logger.error("Network error occurred while fetching events.")
+        return []
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(f"Error fetching events: {e}")
+        return []
+
+
+def send_events_message(formatted_events: List[str]) -> None:
+    """
+    Send formatted events as a message via Telegram.
+
+    Args:
+        formatted_events: A list of formatted event strings.
+
+    Returns:
+        None
+    """
+    if not formatted_events:
+        logger.info("No formatted events to send.")
+        return
+
+    events_message = "\n\n".join(formatted_events)
+    try:
+        send_telegram_message(events_message, logger=logger)
+    except Exception as e:
+        logger.error(f"Error sending message: {e}")
+
+
+def main(range_type: str) -> None:
+    """
+    Main function to fetch and send Google Calendar events.
+
+    Args:
+        range_type: 'week' or 'month' to specify the desired date range.
+
+    Returns
+        None
+    """
+    formatted_events = fetch_and_format_events(range_type)
+    send_events_message(formatted_events)
 
 
 if __name__ == "__main__":
@@ -52,5 +97,4 @@ if __name__ == "__main__":
         ),
     )
     args = parser.parse_args()
-
     main(range_type=args.range_type)

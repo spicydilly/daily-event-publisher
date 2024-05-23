@@ -5,7 +5,7 @@ from src.event import Event, EventFormatter
 
 class TestEvent(unittest.TestCase):
     def test_missing_title(self):
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             Event(
                 description="This is a sample event.",
                 location="A Place",
@@ -13,10 +13,13 @@ class TestEvent(unittest.TestCase):
                 start_time="10:00",
                 end_time="12:00",
             )
-        self.assertEqual(str(context.exception), "Title is required.")
+        self.assertEqual(
+            str(context.exception),
+            "Event.__init__() missing 1 required positional argument: 'title'",
+        )
 
     def test_missing_description(self):
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             Event(
                 title="Sample Event",
                 location="A Place",
@@ -24,10 +27,13 @@ class TestEvent(unittest.TestCase):
                 start_time="10:00",
                 end_time="12:00",
             )
-        self.assertEqual(str(context.exception), "Description is required.")
+        self.assertEqual(
+            str(context.exception),
+            "Event.__init__() missing 1 required positional argument: 'description'",
+        )
 
     def test_missing_date(self):
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             Event(
                 title="Sample Event",
                 location="A Place",
@@ -35,10 +41,13 @@ class TestEvent(unittest.TestCase):
                 start_time="10:00",
                 end_time="12:00",
             )
-        self.assertEqual(str(context.exception), "Date is required.")
+        self.assertEqual(
+            str(context.exception),
+            "Event.__init__() missing 1 required positional argument: 'date'",
+        )
 
     def test_missing_start_time(self):
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             Event(
                 title="Sample Event",
                 location="A Place",
@@ -46,10 +55,13 @@ class TestEvent(unittest.TestCase):
                 description="This is a sample event.",
                 end_time="12:00",
             )
-        self.assertEqual(str(context.exception), "Start time is required.")
+        self.assertEqual(
+            str(context.exception),
+            "Event.__init__() missing 1 required positional argument: 'start_time'",
+        )
 
     def test_missing_end_time(self):
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TypeError) as context:
             Event(
                 title="Sample Event",
                 location="A Place",
@@ -57,7 +69,10 @@ class TestEvent(unittest.TestCase):
                 description="This is a sample event.",
                 start_time="10:00",
             )
-        self.assertEqual(str(context.exception), "End time is required.")
+        self.assertEqual(
+            str(context.exception),
+            "Event.__init__() missing 1 required positional argument: 'end_time'",
+        )
 
     def test_pretty_with_mandatory_fields(self):
         event = Event(
@@ -108,7 +123,3 @@ class TestEvent(unittest.TestCase):
             "[Tickets](www.tickets.com)"
         )
         self.assertEqual(EventFormatter.format(event), expected_output)
-
-
-if __name__ == "__main__":
-    unittest.main()
