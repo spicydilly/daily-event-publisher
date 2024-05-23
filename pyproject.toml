@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "daily-event-publisher"
+name = "event_gram"
 version = "0.1.0"
 description = ""
 authors = ["Dylon Condon <dyloncondon@gmail.com>"]
